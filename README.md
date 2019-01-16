@@ -1,7 +1,7 @@
 # sentimental-lambda
 Lambda architecture code for tweets' sentiment analysis.
 
-In collaboration with Davide Nesi.
+In collaboration with Davide Nesi (@DavideNesi).
 
 ## Overview
 
