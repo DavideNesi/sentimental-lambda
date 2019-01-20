@@ -1,3 +1,5 @@
+package sentiment-lambda.TweetClassifier
+
 import com.aliasi.classify.LMClassifier;
 import com.aliasi.stats.MultivariateEstimator;
 

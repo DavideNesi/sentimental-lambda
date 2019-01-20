@@ -1,4 +1,4 @@
-package TwitterSentimentAnalysis;
+package HadoopSentiment;
 
 import java.io.IOException;
 import java.util.Random;
@@ -17,6 +17,8 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+
+import sentiment-lambda.TweetClassifier;
 
 public class SentimentMapReduce extends Configured implements Tool {
 
@@ -71,7 +73,9 @@ public class SentimentMapReduce extends Configured implements Tool {
 
     public static class Sentiment extends Mapper<LongWritable, Text, Text, IntWritable> {
         public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-            context.write(getSentimentQuality(value), new IntWritable(1));
+            Configuration conf = context.getConfiguration();
+            TweetClassifier tc = conf.get("classifier");
+            context.write(new Text(tc.evaluateText(value)), new IntWritable(1));
         }
     }
 
@@ -93,11 +97,17 @@ public class SentimentMapReduce extends Configured implements Tool {
         System.out.println("Input dir: " + args[0]);
         System.out.println("Output dir: " + args[1]);
 
+        // Create the classifier
+        TweetClassifier tc = new TweetClassifier(args[2]);
+
+
         Job job = Job.getInstance(conf, "TwitterSentiment");
 
         Configuration chainMapConf = new Configuration(false);
-        if (args.length >= 3)
-            chainMapConf.set("query", args[2]);
+        if (args.length >= 4)
+            chainMapConf.set("query", args[3]);
+
+        chainMapConf.set("classifier", tc);
 
         ChainMapper.addMapper(job, Filter.class, Object.class, Text.class, LongWritable.class, Text.class, chainMapConf);
         ChainMapper.addMapper(job, Sentiment.class, LongWritable.class, Text.class, Text.class, IntWritable.class, chainMapConf);
