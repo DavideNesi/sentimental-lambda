@@ -18,7 +18,9 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-import sentiment-lambda.TweetClassifier;
+import Classifier.TweetClassifier;
+
+import javax.naming.Context;
 
 public class SentimentMapReduce extends Configured implements Tool {
 

@@ -1,4 +1,4 @@
-package sentiment-lambda.TweetClassifier
+package Classifier;
 
 import com.aliasi.classify.LMClassifier;
 import com.aliasi.stats.MultivariateEstimator;
@@ -16,7 +16,7 @@ public class TweetClassifier {
     static DynamicLMClassifier<NGramProcessLM> trainedClassificator;
     LMClassifier<NGramProcessLM, MultivariateEstimator> mClassifier;
 
-    TweetClassifier(String datasetPath) throws IOException, ClassNotFoundException {
+    public TweetClassifier(String datasetPath) throws IOException, ClassNotFoundException {
 
         // load the dataset if avaiable, if not throw an exception
         FileInputStream fileInputStream = new FileInputStream(datasetPath);
@@ -27,7 +27,7 @@ public class TweetClassifier {
         mClassifier = (LMClassifier<NGramProcessLM, MultivariateEstimator>)object;
     }
 
-    String evaluateText(String text){
+    public String evaluateText(String text){
         Classification classification = mClassifier.classify(text);
         return classification.bestCategory();
     }
