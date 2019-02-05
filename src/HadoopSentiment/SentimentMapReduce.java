@@ -19,12 +19,14 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
 import Classifier.TweetClassifier;
+import CassandraAdapter.CassandraDriver;
 
 import javax.naming.Context;
 
 public class SentimentMapReduce extends Configured implements Tool {
 
     private static Random randnum = new Random();
+    private String[] args;
 
     public static class Filter extends Mapper<Object, Text, LongWritable, Text> {
 
@@ -55,24 +57,6 @@ public class SentimentMapReduce extends Configured implements Tool {
 
     }
 
-
-    public static Text getSentimentQuality (Text comment){
-        return new Text(getRandomQualitativeAnalysis());
-    }
-
-    public static String getRandomQualitativeAnalysis(){
-        //TODO it for real
-        int r = randnum.nextInt(3);
-        switch(r) {
-            case 0 :
-                return "positive";
-            case 2 :
-                return "negative";
-            default :
-                return "neutral";
-        }
-    }
-
     public static class Sentiment extends Mapper<LongWritable, Text, Text, IntWritable> {
         public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
             Configuration conf = context.getConfiguration();
@@ -88,6 +72,16 @@ public class SentimentMapReduce extends Configured implements Tool {
                 sum += val.get();
 
             context.write(key, new IntWritable(sum));
+
+            try{
+                CassandraDriver cassandra = context.get("cassandra");
+                String query = conf.get("query");
+                cassandra.addTweetCountEntry(query, key, sum);
+            }catch (Exception ex){
+                System.out.println("I was unable to write on Cassandra. Check log or stack trace.");
+                System.out.println(ex);
+            }
+
         }
     }
 
@@ -102,6 +96,16 @@ public class SentimentMapReduce extends Configured implements Tool {
         // Create the classifier
         TweetClassifier tc = new TweetClassifier(args[2]);
 
+        // Create Cassandra's driver
+        CassandraDriver cassandra;
+        try{
+            cassandra = new CassandraDriver();
+            cassandra.createConnection("127.0.0.1"); // Ip address of Cassandra cluster
+        }catch(Exception ex){
+            System.out.println(ex);
+        }
+
+
 
         Job job = Job.getInstance(conf, "TwitterSentiment");
 
@@ -110,6 +114,7 @@ public class SentimentMapReduce extends Configured implements Tool {
             chainMapConf.set("query", args[3]);
 
         chainMapConf.set("classifier", tc);
+        conf.set("cassandra", cassandra);
 
         ChainMapper.addMapper(job, Filter.class, Object.class, Text.class, LongWritable.class, Text.class, chainMapConf);
         ChainMapper.addMapper(job, Sentiment.class, LongWritable.class, Text.class, Text.class, IntWritable.class, chainMapConf);
@@ -124,8 +129,13 @@ public class SentimentMapReduce extends Configured implements Tool {
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
         boolean success = job.waitForCompletion(true);
+
+        if(cassandra != null)
+            cassandra.closeConnection();
+
         return success ? 0 : 1;
     }
+
 
     public static void main(String[] args) throws Exception {
         int res = ToolRunner.run(new Configuration(), new SentimentMapReduce(), args);
