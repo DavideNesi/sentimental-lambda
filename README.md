@@ -3,6 +3,10 @@ Lambda architecture code for tweets' sentiment analysis.
 
 In collaboration with [Davide Nesi](https://github.com/DavideNesi).
 
+<p align="center">
+    <img width="343" height="193" src="https://github.com/rickie95/sentimental-lambda/blob/master/NotEssentialFiles/meme.png">
+</p>
+
 ## Overview
 
 This code is designed to work with Hadoop 2.9.2, Storm 1.2.2, Cassandra 3.11 and LingPipe.
@@ -42,6 +46,4 @@ Storm table (keyword, timestamp, positive_count, negative_count, neutral_count)
 * [LingPipe toolkit](http://alias-i.com/)
 * [Nathan Marz](https://github.com/nathanmarz) - "Big Data", Manning.
 
-<p align="center">
-    <img width="480" height="270" src="https://github.com/rickie95/sentimental-lambda/blob/master/NotEssentialFiles/meme.png">
-</p>
+
