@@ -17,3 +17,5 @@ Generate the `.jar` archive, then
     hadoop jar artifact-name.jar /input/dir/path /output/dir/path ["keyword"]
     
 If `keyword` is entered, only tweets that contains `keyword` will be counted.
+
+![Meme](/NotEssentialFiles/meme.png)
