@@ -120,14 +120,17 @@ public class SentimentMapReduce extends Configured implements Tool {
         Job job = Job.getInstance(conf, "TwitterSentiment");
 
         Configuration chainMapConf = new Configuration(false);
+        conf.set("cassandra_ip", "127.0.0.1");
         if (args.length >3)
-            chainMapConf.set("query", args[3]);
+            conf.set("cassandra_ip", args[3]);
+        
+        if (args.length >4)
+            chainMapConf.set("query", args[4]);
 
         chainMapConf.set("classifier", args[2]);
 
-        conf.set("cassandra_ip", "127.0.0.1");
-        if (args.length >4)
-            conf.set("cassandra_ip", args[4]);
+        
+        
 
         ChainMapper.addMapper(job, Filter.class, Object.class, Text.class, LongWritable.class, Text.class, chainMapConf);
         ChainMapper.addMapper(job, Sentiment.class, LongWritable.class, Text.class, Text.class, IntWritable.class, chainMapConf);
