@@ -10,7 +10,12 @@ In collaboration with [Davide Nesi](https://github.com/DavideNesi).
 ## Overview
 
 This code is designed to work with Hadoop 2.9.2, Storm 1.2.2, Cassandra 3.11 and LingPipe.
+### Architecture schema
+<p align="center">
+    <img width="100%" height="auto" src="https://github.com/rickie95/sentimental-lambda/blob/master/NotEssentialFiles/Architecture.png">
+</p>
 
+## Insights
 ### Hadoop code
 
 Map (Filter tweets by keyword) -> Map (Assign a sentiment value to each tweet) -> Reduce (count each sentiment).
