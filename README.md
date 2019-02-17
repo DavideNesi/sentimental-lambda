@@ -43,9 +43,24 @@ If `keyword` is entered, only tweets that contains `keyword` will be counted.
 Below the code for create the schemas in the database.
 
 **DDL**
-Hadoop tables (keyword, timestamp, count)
+First, create the workspace: 
 
-Storm table (keyword, timestamp, positive_count, negative_count, neutral_count)
+`CREATE KEYSPACE SentimentAnalysis WITH REPLICATION = { 'class' : 'NetworkTopologyStrategy', 'datacenter1' : 3 };`
+`USE SentimentAnalysis;`
+
+Then proceed to create Hadoop tables
+
+`CREATE TABLE positives ( timestmp timestamp, keyword varchar, count bigint, PRIMARY KEY (keyword, timestmp) ) WITH CLUSTERING ORDER BY (timestmp DESC);`
+
+`CREATE TABLE negatives ( timestmp timestamp, keyword varchar, count bigint, PRIMARY KEY (keyword, timestmp) ) WITH CLUSTERING ORDER BY (timestmp DESC);`
+
+`CREATE TABLE neutrals ( timestmp timestamp, keyword varchar, count bigint, PRIMARY KEY (keyword, timestmp) ) WITH CLUSTERING ORDER BY (timestmp DESC);`
+
+Last, Storm tables:
+
+`CREATE TABLE storm_queries ( timestmp timestamp, keyword varchar, positive bigint, negative bigint, neutral bigint,  PRIMARY KEY (keyword, timestmp) ) WITH CLUSTERING ORDER BY (timestmp DESC);`
+
+Use CassandraDriver's methods for insert.
 
 ## Credits
 * [LingPipe toolkit](http://alias-i.com/)
